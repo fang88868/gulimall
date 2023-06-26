@@ -1,64 +1,90 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package com.example.common.utils;
 
-import org.apache.http.HttpStatus;
 
-import java.util.HashMap;
-import java.util.Map;
 
-/**
- * 返回数据
- *
- * @author Mark sunlightcs@gmail.com
- */
-public class R extends HashMap<String, Object> {
+import lombok.Data;
+
+import java.io.Serializable;
+@Data
+public class R<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
-	public R() {
-		put("code", 0);
-		put("msg", "success");
-	}
-	
-	public static R error() {
-		return error(HttpStatus.SC_INTERNAL_SERVER_ERROR, "未知异常，请联系管理员");
-	}
-	
-	public static R error(String msg) {
-		return error(HttpStatus.SC_INTERNAL_SERVER_ERROR, msg);
-	}
-	
-	public static R error(int code, String msg) {
-		R r = new R();
-		r.put("code", code);
-		r.put("msg", msg);
-		return r;
+
+	/**
+	 * 成功标志
+	 */
+	private boolean success = true;
+
+	/**
+	 * 返回处理消息
+	 */
+	private String message = "操作成功！";
+
+	/**
+	 * 返回代码
+	 */
+	private Integer code = 0;
+
+	/**
+	 * 返回数据对象 data
+	 */
+	private T data;
+
+
+	public R(){
+
 	}
 
-	public static R ok(String msg) {
-		R r = new R();
-		r.put("msg", msg);
-		return r;
-	}
-	
-	public static R ok(Map<String, Object> map) {
-		R r = new R();
-		r.putAll(map);
-		return r;
-	}
-	
-	public static R ok() {
-		return new R();
-	}
-
-	public R put(String key, Object value) {
-		super.put(key, value);
+	public R<T> error(String message) {
+		this.message = message;
+		this.code = CommonConstant.SC_INTERNAL_SERVER_ERROR_500;
+		this.success = false;
 		return this;
+	}
+
+	public R(boolean success, String message, Integer code, T data) {
+		this.success = success;
+		this.message = message;
+		this.code = code;
+		this.data = data;
+	}
+
+	public static R<Object> ok() {
+		R<Object> r = new R<Object>();
+		r.setSuccess(true);
+		r.setCode(CommonConstant.SC_OK_200);
+		r.setMessage("成功");
+		return r;
+	}
+
+	public static R<Object> ok(String msg) {
+		R<Object> r = new R<Object>();
+		r.setSuccess(true);
+		r.setCode(CommonConstant.SC_OK_200);
+		r.setMessage(msg);
+		return r;
+	}
+
+	public static R<Object> ok(Object data) {
+		R<Object> r = new R<Object>();
+		r.setSuccess(true);
+		r.setCode(CommonConstant.SC_OK_200);
+		r.setData(data);
+		return r;
+	}
+
+	public static R<Object> error(int code, String msg) {
+		R<Object> r = new R<Object>();
+		r.setCode(code);
+		r.setMessage(msg);
+		r.setSuccess(false);
+		return r;
+	}
+	public static R<Object> error500( String msg) {
+		R<Object> r = new R<Object>();
+		r.setCode(CommonConstant.SC_INTERNAL_SERVER_ERROR_500);
+		r.setMessage(msg);
+		r.setSuccess(false);
+		return r;
 	}
 }
